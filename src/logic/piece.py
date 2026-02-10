@@ -1,14 +1,23 @@
+
+from src.utils.constants import PIECE_MASTER, PIECE_STUDENT
+
 class Piece:
-    def _init_(self, color: str, kind: str):
+    """
+    Representa una pieza individual en el tablero de Onitama.
+    """
+    def __init__(self, color: str, kind: str):
         """
-        color: 'R' o 'B'
-        kind: 'MAESTRO' o 'ESTUDIANTE'
+        :param color: 'RED' o 'BLUE' (definidos en constants.py)
+        :param kind: 'M' (Maestro) o 'S' (Estudiante)
+>>>>>>> merge-principal
         """
         self.color = color
         self.kind = kind
 
-    def _str_(self):
-        if self.color == "R":
-            return "R" if self.kind == "MAESTRO" else "r"
-        else:
-            return "B" if self.kind == "MAESTRO" else "b"
+    def __str__(self) -> str:
+        """Representación visual rápida: R_M, B_S, etc."""
+        return f"{self.color[0]}_{self.kind[0]}"
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
