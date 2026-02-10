@@ -38,4 +38,4 @@ class Board:
                 board_str += cell + "|"
             board_str += "\n  -------------------\n"
         return board_str
->>>>>>> merge-principal
+
