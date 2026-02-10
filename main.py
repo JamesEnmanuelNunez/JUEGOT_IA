@@ -1,63 +1,56 @@
 import sys
-
-# constantes
 from src.utils.constants import PLAYER_RED, PLAYER_BLUE, Colors
-
-# componentes
-from src.logic.board import Board
-from src.logic.card import deal_cards
+from src.logic.game_engine import GameEngine
 
 def main():
-    """
-    Función principal. Inicializa el juego y prueba la integración de componentes.
-    """
-    print(f"{Colors.BOLD}=== INICIANDO ONITAMA (MODO DEPURACIÓN) ==={Colors.RESET}")
+    print(f"{Colors.BOLD}=== ONITAMA: MOTOR DE JUEGO ACTIVADO ==={Colors.RESET}")
     
-    # iniciar tableto
-    print(f"\n{Colors.YELLOW_TXT}1. Generando Tablero y Piezas...{Colors.RESET}")
-    board = Board()
-    print(board)  
+    # inicia el juego
+    game = GameEngine()
     
-    # reparte cartas
-    print(f"{Colors.YELLOW_TXT}2. Barajando y Repartiendo Cartas...{Colors.RESET}")
-    red_hand, blue_hand, extra_card = deal_cards()
-    
-    # manos repartidas
-    print(f"  🔴 Mano Roja:  {red_hand}")
-    print(f"  🔵 Mano Azul:  {blue_hand}")
-    print(f"  ⚪ Carta Mesa: {extra_card}")
-
-    # turno
-    current_player = extra_card.color
-    
-    print(f"\n{Colors.GREEN_TXT}>>> REGLA DE ORO: La carta extra es {extra_card.color}.{Colors.RESET}")
-    print(f"{Colors.GREEN_TXT}>>> ¡EMPIEZA EL JUGADOR {current_player}!{Colors.RESET}")
-
-    # bucle
     turn_count = 1
-    is_running = True
-
-    while is_running:
+    
+    while not game.winner:
         try:
-            print(f"\n--- Ronda {turn_count} | Turno de: {current_player} ---")
+            #pantalla
+            print("\n" + "="*30)
+            print(f"{Colors.BOLD}RONDA {turn_count}{Colors.RESET}")
+            print(f"Turno de: {Colors.RED_TXT if game.current_turn == PLAYER_RED else Colors.BLUE_TXT}{game.current_turn}{Colors.RESET}")
             
-            # Aquí iría la lógica de pedir movimiento (input)
-            # Como aún no tenemos Game Engine, solo pausamos para ver el resultado.
+            #Mostrar Tablero
+            print(game.board)
             
-            cmd = input("Presiona ENTER para simular cambio de turno (o 'q' para salir): ")
+            #Mostrar Cartas del Jugador Actual
+            current_hand = game.red_hand if game.current_turn == PLAYER_RED else game.blue_hand
+            print(f"Tu Mano: {current_hand}")
+            print(f"{Colors.YELLOW_TXT}Carta en Mesa (Extra): {game.extra_card}{Colors.RESET}")
+
+            #simulacion de juego
+            print("\nMOVIMIENTO SIMULADO:")
+            print("1. Seleccionando la primera carta de tu mano...")
+            print("2. Intercambiando con la mesa...")
+            
+            cmd = input(f"\nPresiona ENTER para ejecutar turno o 'q' para salir: ")
             
             if cmd.lower() == 'q':
-                print("Cerrando juego...")
-                is_running = False
                 break
+
+            # Ejecutamos un "movimiento fantasma" (start=None, end=None) 
+            # solo para probar que la rotación de cartas y turnos funciona.
+            # Usamos el índice 0 de la mano.
+            game.execute_move((0,0), (0,0), 0) 
             
-            # Cambio de turno simple para probar el bucle
-            current_player = PLAYER_BLUE if current_player == PLAYER_RED else PLAYER_RED
             turn_count += 1
 
         except KeyboardInterrupt:
-            print(f"\n{Colors.YELLOW_TXT}Juego interrumpido.{Colors.RESET}")
+            print(f"\n{Colors.YELLOW_TXT}Saliendo...{Colors.RESET}")
             sys.exit(0)
+        except Exception as e:
+            print(f"{Colors.RED_TXT}Error en el Game Engine: {e}{Colors.RESET}")
+            break
+
+    if game.winner:
+        print(f"\n{Colors.GREEN_TXT}¡PARTIDA TERMINADA! GANADOR: {game.winner}{Colors.RESET}")
 
 if __name__ == "__main__":
     main()
