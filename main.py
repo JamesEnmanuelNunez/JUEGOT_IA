@@ -1,3 +1,4 @@
+from src.logic.ai_agent import MinimaxAgent
 from src.logic.game_engine import GameEngine
 from src.ui.display import draw_board, draw_card_map
 from src.ui.input import get_player_move, select_card_index
