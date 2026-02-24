@@ -1,4 +1,5 @@
 from typing import Tuple, Optional
+from src.utils.constants import Colors
 
 def get_player_move() -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
     """
@@ -46,3 +47,25 @@ def select_card_index(hand) -> Optional[int]:
             print(" Error: Elige 0, 1 o 'q'.")
         except ValueError:
             print(" Error: Entrada inválida.")
+
+
+
+def setup_menu():
+    print(f"\n{Colors.BOLD}=== CONFIGURACIÓN DE LA PARTIDA ==={Colors.RESET}")
+    num_players = input("Ingrese la cantidad de jugadores (Ej: 2): ")
+    
+    print("\nDefina quién controla cada bando (H = Humano, I = IA):")
+    p1_type = input("Jugador 1 (RED) - ¿Humano o IA? [H/I]: ").strip().upper()
+    p2_type = input("Jugador 2 (BLUE) - ¿Humano o IA? [H/I]: ").strip().upper()
+    
+    ai_time = 0
+    if p1_type == 'I' or p2_type == 'I':
+        ai_time_str = input("\nIngrese el tiempo máximo para la IA (en seg, ej: 3): ")
+        ai_time = int(ai_time_str) if ai_time_str.isdigit() else 3
+        
+    return {
+        "num_players": int(num_players) if num_players.isdigit() else 2,
+        "RED": "HUMAN" if p1_type == 'H' else "AI",
+        "BLUE": "HUMAN" if p2_type == 'H' else "AI",
+        "ai_max_time": ai_time
+    }

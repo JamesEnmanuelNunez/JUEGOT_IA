@@ -4,7 +4,11 @@ from src.logic.card import Card, deal_cards
 from src.utils.constants import PLAYER_RED, PLAYER_BLUE, ROWS, COLS, PIECE_MASTER
 
 class GameEngine:
-    def __init__(self):
+    def __init__(self, config=None):
+
+
+        self.config = config if config is not None else {}
+
         #componentes del board 
         self.board = Board()
         
