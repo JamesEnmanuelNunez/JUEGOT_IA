@@ -1,5 +1,6 @@
 import time
 import copy
+from src.logic.Heuristicas import Evaluador
 
 class TimeoutException(Exception):
     """Excepción para detener la búsqueda cuando se acaba el tiempo."""
@@ -8,6 +9,7 @@ class TimeoutException(Exception):
 class MinimaxAgent:
     def __init__(self, ai_color):
         self.ai_color = ai_color # BLUE o RED
+        self.evaluador = Evaluador()
 
     def get_best_move(self, game_state, max_time):
         """
@@ -104,17 +106,10 @@ class MinimaxAgent:
                     break # Cortar rama inútil
             return min_eval, best_move
 
+   
     def _basic_heuristic(self, game_state, winner):
-        """
-        Función temporal para evaluar qué tan bueno es un tablero.
-        La persona de la Parte 3 cambiará esto por una heurística avanzada.
-        """
-        if winner == self.ai_color:
-            return 10000 # Ganamos
-        elif winner == self._get_opponent_color():
-            return -10000 # Perdimos
-            
-        return 0 # Empate temporal para que el código no falle
+        
+        return self.evaluador(game_state, self.ai_color)
 
     def _get_opponent_color(self):
         return 'RED' if self.ai_color == 'BLUE' else 'BLUE'

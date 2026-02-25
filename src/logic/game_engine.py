@@ -3,6 +3,13 @@ from src.logic.board import Board
 from src.logic.card import Card, deal_cards
 from src.utils.constants import PLAYER_RED, PLAYER_BLUE, ROWS, COLS, PIECE_MASTER
 
+class Move:
+    """Clase simple para empaquetar los datos de un movimiento para la IA."""
+    def __init__(self, start: Tuple[int, int], end: Tuple[int, int], card_idx: int):
+        self.start = start
+        self.end = end
+        self.card_idx = card_idx
+
 class GameEngine:
     def __init__(self, config=None):
 
@@ -83,3 +90,41 @@ class GameEngine:
             self.switch_turn()
             
         return True
+    
+    def get_all_legal_moves(self, color: str) -> List[Move]:
+        """Genera una lista con todos los movimientos válidos para un color dado."""
+        legal_moves = []
+        hand = self.red_hand if color == PLAYER_RED else self.blue_hand
+        
+        # 1. Escanear todo el tablero buscando piezas del color que tiene el turno
+        for r in range(ROWS):
+            for c in range(COLS):
+                piece = self.board.grid[r][c]
+                
+                if piece is not None and piece.color == color:
+                    start_pos = (r, c)
+                    
+                    # 2. Por cada pieza, probamos las 2 cartas en la mano
+                    for card_idx, card in enumerate(hand):
+                        
+                        # (Nota: Asumo que en tu card.py tienes una lista de tuplas llamada 'moves')
+                        for dr, dc in card.moves: 
+                            
+                            # 3. Ajustar la dirección según el bando (RED sube, BLUE baja)
+                            if color == PLAYER_RED:
+                                target_r = r - dr
+                                target_c = c + dc
+                            else:
+                                target_r = r + dr
+                                target_c = c - dc
+                                
+                            # 4. Verificar que el destino no se salga del tablero (5x5)
+                            if 0 <= target_r < ROWS and 0 <= target_c < COLS:
+                                target_piece = self.board.grid[target_r][target_c]
+                                
+                                # 5. El movimiento es legal si la casilla está vacía o tiene un enemigo
+                                if target_piece is None or target_piece.color != color:
+                                    end_pos = (target_r, target_c)
+                                    legal_moves.append(Move(start_pos, end_pos, card_idx))
+                                    
+        return legal_moves
