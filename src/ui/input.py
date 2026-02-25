@@ -58,8 +58,28 @@ def setup_menu():
     p1_type = input("Jugador 1 (RED) - ¿Humano o IA? [H/I]: ").strip().upper()
     p2_type = input("Jugador 2 (BLUE) - ¿Humano o IA? [H/I]: ").strip().upper()
     
+    p1_bot = "MINIMAX"
+    p2_bot = "MINIMAX"
     ai_time = 0
+    
     if p1_type == 'I' or p2_type == 'I':
+        print("\nTipos de IA disponibles:")
+        print("1. Minimax (Inteligente y Completa)")
+        print("2. Greedy (Avara - Busca comer rápido)")
+        print("3. Random (Aleatoria - Movimientos al azar)")
+        print("4. Worst (Suicida - Busca perder)")
+        
+        # Mapeo de opciones
+        bot_options = {"1": "MINIMAX", "2": "GREEDY", "3": "RANDOM", "4": "WORST"}
+        
+        if p1_type == 'I':
+            choice = input(f"Elige la personalidad para la IA RED [1-4]: ").strip()
+            p1_bot = bot_options.get(choice, "MINIMAX")
+            
+        if p2_type == 'I':
+            choice = input(f"Elige la personalidad para la IA BLUE [1-4]: ").strip()
+            p2_bot = bot_options.get(choice, "MINIMAX")
+
         ai_time_str = input("\nIngrese el tiempo máximo para la IA (en seg, ej: 3): ")
         ai_time = int(ai_time_str) if ai_time_str.isdigit() else 3
         
@@ -67,5 +87,7 @@ def setup_menu():
         "num_players": int(num_players) if num_players.isdigit() else 2,
         "RED": "HUMAN" if p1_type == 'H' else "AI",
         "BLUE": "HUMAN" if p2_type == 'H' else "AI",
+        "RED_BOT": p1_bot,
+        "BLUE_BOT": p2_bot,
         "ai_max_time": ai_time
     }

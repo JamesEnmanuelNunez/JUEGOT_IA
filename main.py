@@ -3,6 +3,7 @@ from src.logic.game_engine import GameEngine
 from src.ui.display import draw_board, draw_card_map
 from src.ui.input import get_player_move, select_card_index
 from src.utils.constants import Colors
+from src.ai.opponents import RandomBot, GreedyBot, WorstBot
 
 def setup_menu():
     print(f"\n{Colors.BOLD}=== CONFIGURACIÓN DE LA PARTIDA ==={Colors.RESET}")
@@ -12,8 +13,28 @@ def setup_menu():
     p1_type = input("Jugador 1 (RED) - ¿Humano o IA? [H/I]: ").strip().upper()
     p2_type = input("Jugador 2 (BLUE) - ¿Humano o IA? [H/I]: ").strip().upper()
     
+    p1_bot = "MINIMAX"
+    p2_bot = "MINIMAX"
     ai_time = 0
-    if p1_type == 'I' or p2_type == 'I':
+    
+    if p1_type == 'I' or p2_type == 'I':2
+        print("\nTipos de IA disponibles:")
+        print("1. Minimax (Inteligente y Completa)")
+        print("2. Greedy (Avara - Busca comer rápido)")
+        print("3. Random (Aleatoria - Movimientos al azar)")
+        print("4. Worst (Suicida - Busca perder)")
+        
+        # Mapeo de opciones
+        bot_options = {"1": "MINIMAX", "2": "GREEDY", "3": "RANDOM", "4": "WORST"}
+        
+        if p1_type == 'I':
+            choice = input(f"Elige la personalidad para la IA RED [1-4]: ").strip()
+            p1_bot = bot_options.get(choice, "MINIMAX")
+            
+        if p2_type == 'I':
+            choice = input(f"Elige la personalidad para la IA BLUE [1-4]: ").strip()
+            p2_bot = bot_options.get(choice, "MINIMAX")
+
         ai_time_str = input("\nIngrese el tiempo máximo para la IA (en seg, ej: 3): ")
         ai_time = int(ai_time_str) if ai_time_str.isdigit() else 3
         
@@ -21,6 +42,8 @@ def setup_menu():
         "num_players": int(num_players) if num_players.isdigit() else 2,
         "RED": "HUMAN" if p1_type == 'H' else "AI",
         "BLUE": "HUMAN" if p2_type == 'H' else "AI",
+        "RED_BOT": p1_bot,
+        "BLUE_BOT": p2_bot,
         "ai_max_time": ai_time
     }
 
@@ -70,13 +93,22 @@ def main():
 
             else:
                 # TURNO DE LA IA
-                print(f"\nLa IA ({game.current_turn}) está pensando por un máximo de {config['ai_max_time']} segundos...")
+                bot_type = config[f"{game.current_turn}_BOT"]
+                print(f"\nLa IA ({game.current_turn} - {bot_type}) está pensando...")
                 
-                # 1. Instanciamos tu IA
-                ia_agent = MinimaxAgent(ai_color=game.current_turn)
-                
-                # 2. Le pedimos a la IA que calcule
-                best_move = ia_agent.get_best_move(game, config['ai_max_time'])
+                # 1. Instanciamos el bot correcto según el menú
+                if bot_type == "RANDOM":
+                    ia_agent = RandomBot(ai_color=game.current_turn)
+                    best_move = ia_agent.get_best_move(game)
+                elif bot_type == "GREEDY":
+                    ia_agent = GreedyBot(ai_color=game.current_turn)
+                    best_move = ia_agent.get_best_move(game)
+                elif bot_type == "WORST":
+                    ia_agent = WorstBot(ai_color=game.current_turn)
+                    best_move = ia_agent.get_best_move(game)
+                else: # MINIMAX por defecto
+                    ia_agent = MinimaxAgent(ai_color=game.current_turn)
+                    best_move = ia_agent.get_best_move(game, config['ai_max_time'])
                 
                 # 3. Ejecutamos la decisión
                 if best_move:
@@ -85,11 +117,11 @@ def main():
                     
                     if not success:
                         print(f"\n{Colors.RED_TXT} Error de la IA: Movimiento no permitido.{Colors.RESET}")
-                        break # Algo salió mal con la lógica de la IA
+                        break
                 else:
                     print("La IA no encontró movimientos válidos. Pierde su turno (o se rinde).")
-                    break
 
+                    break
         # REVISIÓN DE VICTORIA FUERA DEL BUCLE DE TURNOS
         if game.winner:
             draw_board(game.board) # Dibujar el tablero final
