@@ -17,7 +17,7 @@ def setup_menu():
     p2_bot = "MINIMAX"
     ai_time = 0
     
-    if p1_type == 'I' or p2_type == 'I':2
+    if p1_type == 'I' or p2_type == 'I':
         print("\nTipos de IA disponibles:")
         print("1. Minimax (Inteligente y Completa)")
         print("2. Greedy (Avara - Busca comer rápido)")

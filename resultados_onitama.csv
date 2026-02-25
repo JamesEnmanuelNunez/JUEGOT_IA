@@ -1,0 +1,21 @@
+Configuracion,Ganador,Piezas_Rojas,Piezas_Azules,Duracion_Partida,Total_Movimientos
+Minimax vs Random (Intento 1),RED,5,4,21.0019,14
+Minimax vs Random (Intento 2),RED,5,2,33.0079,22
+Minimax vs Random (Intento 3),RED,5,3,18.0044,11
+Minimax vs Random (Intento 4),RED,5,4,6.0012,3
+Minimax vs Random (Intento 5),RED,5,3,15.0021,9
+Minimax vs Greedy (Intento 1),RED,5,4,9.0129,6
+Minimax vs Greedy (Intento 2),RED,4,2,18.0158,12
+Minimax vs Greedy (Intento 3),RED,3,2,18.0165,11
+Minimax vs Greedy (Intento 4),RED,5,4,12.0127,8
+Minimax vs Greedy (Intento 5),RED,3,0,30.0217,19
+Minimax vs WorstBot (Intento 1),RED,5,3,24.0178,15
+Minimax vs WorstBot (Intento 2),RED,5,2,33.0287,22
+Minimax vs WorstBot (Intento 3),RED,5,4,9.011,5
+Minimax vs WorstBot (Intento 4),RED,5,1,42.0551,28
+Minimax vs WorstBot (Intento 5),RED,5,3,48.064,32
+Minimax vs Minimax (Intento 1),RED,3,1,102.0255,34
+Minimax vs Minimax (Intento 2),BLUE,1,3,78.0175,26
+Minimax vs Minimax (Intento 3),RED,2,0,111.0259,37
+Minimax vs Minimax (Intento 4),RED,3,2,87.0178,29
+Minimax vs Minimax (Intento 5),RED,2,2,126.0225,42

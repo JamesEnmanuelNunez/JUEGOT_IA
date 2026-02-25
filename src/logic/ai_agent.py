@@ -20,18 +20,18 @@ class MinimaxAgent:
         depth = 1
 
         try:
-            # IDS: Profundizamos cada vez más hasta que salte la alarma de tiempo
+            # la alarma que sea atiempo
             while (time.time() - start_time) < max_time:
-                # Calculamos el mejor movimiento para la profundidad actual
+                #  el mejor movimiento para la profundidad actual
                 score, current_best_move = self.minimax(
                     game_state, depth, float('-inf'), float('inf'), True, start_time, max_time
                 )
                 
-                # Si terminamos esta profundidad sin quedarnos sin tiempo, lo guardamos
+                # se guarda por si no se tenia tiempo
                 if current_best_move:
                     best_move_overall = current_best_move
                 
-                depth += 1 # Vamos un nivel más profundo para la siguiente iteración
+                depth += 1 #nivel mas profundo
 
         except TimeoutException:
             # ¡Se acabó el tiempo a mitad de un cálculo profundo!

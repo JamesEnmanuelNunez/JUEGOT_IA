@@ -1,65 +1,48 @@
 import csv
 import time
+import copy
 from src.logic.game_engine import GameEngine
-from src.logic.test_bots import TestBots
-from src.logic.ai.minimax_engine import MinimaxEngine
-
+from src.logic.ai_agent import MinimaxAgent
+from src.ai.opponents import RandomBot, GreedyBot, WorstBot
 
 class Benchmark:
-
     def __init__(self):
         self.results = []
 
-    def run_match(self, red_player, blue_player, label):
-
+    def run_match(self, red_bot, blue_bot, label):
+        # Iniciamos un motor limpio para cada partida
         engine = GameEngine()
-        bots = TestBots(engine)
-
         start_time = time.time()
+        
+        # Límite de seguridad de movimientos para evitar bucles infinitos
+        max_moves = 200 
+        move_count = 0
 
-        while not engine.winner:
-
-            if engine.current_turn == "RED":
-                move = self.get_move(red_player, engine, bots)
-            else:
-                move = self.get_move(blue_player, engine, bots)
+        while not engine.winner and move_count < max_moves:
+            current_agent = red_bot if engine.current_turn == "RED" else blue_bot
+            
+            # Pedir movimiento al bot
+            # Pasamos 3 segundos por defecto si no es Minimax
+            move = current_agent.get_best_move(engine, 3) 
 
             if move is None:
                 break
 
-            start, end, idx = move
-            engine.execute_move(start, end, idx)
+            engine.execute_move(move.start, move.end, move.card_idx)
+            move_count += 1
 
         total_time = time.time() - start_time
 
         result = {
-            "config": label,
-            "winner": engine.winner,
-            "red_pieces": self.count_pieces(engine, "RED"),
-            "blue_pieces": self.count_pieces(engine, "BLUE"),
-            "nodes_expanded": getattr(red_player, "nodes_expanded", 0),
-            "depth_reached": getattr(red_player, "max_depth_reached", 0),
-            "match_time": round(total_time, 4)
+            "Configuracion": label,
+            "Ganador": engine.winner if engine.winner else "Empate/Timeout",
+            "Piezas_Rojas": self.count_pieces(engine, "RED"),
+            "Piezas_Azules": self.count_pieces(engine, "BLUE"),
+            "Duracion_Partida": round(total_time, 4),
+            "Total_Movimientos": move_count
         }
-
         self.results.append(result)
-
-    def get_move(self, player, engine, bots):
-
-        if player == "random":
-            return bots.random_bot()
-
-        if player == "greedy":
-            return bots.greedy_bot()
-
-        if player == "worst":
-            moves = bots.get_all_legal_moves()
-            return moves[-1] if moves else None
-
-        if isinstance(player, MinimaxEngine):
-            return player.search(engine, engine.current_turn)
-
-        return None
+        print(f" Partida finalizada: {label} -> Ganador: {engine.winner}")
 
     def count_pieces(self, engine, color):
         count = 0
@@ -69,60 +52,30 @@ class Benchmark:
                     count += 1
         return count
 
-    def export_csv(self, filename="benchmark_results.csv"):
-
+    def export_csv(self, filename="resultados_onitama.csv"):
+        if not self.results: return
         with open(filename, "w", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=self.results[0].keys())
             writer.writeheader()
             writer.writerows(self.results)
+        print(f"\n✅ Laboratorio terminado. Datos guardados en '{filename}'")
 
-        print(f"\nBenchmark terminado. Archivo '{filename}' generado.")
-
-
-# ================================
-# EJECUCIÓN PRINCIPAL
-# ================================
 if __name__ == "__main__":
+    lab = Benchmark()
+    
+    # 1. Definimos los contrincantes
+    print(" Iniciando simulaciones de laboratorio...")
+    
+    # Pruebas: 5 partidas por cada configuración
+    configs = [
+        (MinimaxAgent("RED"), RandomBot("BLUE"), "Minimax vs Random"),
+        (MinimaxAgent("RED"), GreedyBot("BLUE"), "Minimax vs Greedy"),
+        (MinimaxAgent("RED"), WorstBot("BLUE"), "Minimax vs WorstBot"),
+        (MinimaxAgent("RED"), MinimaxAgent("BLUE"), "Minimax vs Minimax")
+    ]
 
-    benchmark = Benchmark()
+    for red, blue, label in configs:
+        for i in range(5): # Hacemos 5 repeticiones
+            lab.run_match(red, blue, f"{label} (Intento {i+1})")
 
-    times = [1, 3, 10]  # Configuraciones de tiempo
-
-    for t in times:
-
-        minimax = MinimaxEngine(max_time=t)
-
-        # Minimax vs Random
-        for i in range(10):
-            benchmark.run_match(
-                minimax,
-                "random",
-                f"Minimax({t}s) vs Random"
-            )
-
-        # Minimax vs Greedy
-        for i in range(10):
-            benchmark.run_match(
-                minimax,
-                "greedy",
-                f"Minimax({t}s) vs Greedy"
-            )
-
-        # Minimax vs Worst
-        for i in range(10):
-            benchmark.run_match(
-                minimax,
-                "worst",
-                f"Minimax({t}s) vs Worst"
-            )
-
-        # Minimax vs Minimax
-        for i in range(10):
-            minimax2 = MinimaxEngine(max_time=t)
-            benchmark.run_match(
-                minimax,
-                minimax2,
-                f"Minimax({t}s) vs Minimax({t}s)"
-            )
-
-    benchmark.export_csv()
+    lab.export_csv()
